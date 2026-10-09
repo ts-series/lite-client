@@ -40,9 +40,30 @@ import { TableObject, Table } from "./table.ts";
 
 //
 
-
-
 export type MutationResult = undefined | unknown[] | Record<PropertyKey, unknown>;
+
+
+export interface ValuesMethod {
+	(col: Column): unknown[][];
+	(table: Table): unknown[][];
+	(clauses: SelectClauses): unknown[][];
+	(sql: string, ...params: unknown[]): unknown[][];
+	(first: Column, ...rest: Column[]): unknown[][];
+	insert(data: InsertData): undefined | unknown[][];
+	update(data: UpdateData): undefined | unknown[][];
+	delete(data: DeleteData): undefined | unknown[][];
+}
+
+
+export interface ScalarsMethod {
+	<T>(clauses: SelectClauses & { nestBy: NestByClause }): T;
+	<V = unknown>(table: Table): V[];
+	<V = unknown>(clauses: SelectClauses): V[];
+	<V = unknown>(sql: string, ...params: unknown[]): V[];
+	insert(data: InsertData): undefined | unknown[];
+	update(data: UpdateData): undefined | unknown[];
+	delete(data: DeleteData): undefined | unknown[];
+}
 
 
 //
@@ -155,7 +176,7 @@ export abstract class BaseClient {
 	}
 
 
-	values = Object.assign(
+	values: ValuesMethod = Object.assign(
 		((sqlOrSelection: string | SelectClauses | Table | Column, ...rest: unknown[]): unknown[][] => {
 			if (typeof sqlOrSelection === "string") {
 				return this.execute(ReturnMethod.values, sqlOrSelection, rest) as any;
@@ -169,17 +190,7 @@ export abstract class BaseClient {
 			else {
 				return this.__select(ReturnMethod.values, sqlOrSelection) as any;
 			}
-		}) as unknown as {
-			(col: Column): unknown[][];
-			(table: Table): unknown[][];
-			(clauses: SelectClauses): unknown[][];
-			(sql: string, ...params: unknown[]): unknown[][];
-			(first: Column, ...rest: Column[]): unknown[][];
-	
-			insert(data: InsertData): undefined | unknown[][];
-			update(data: UpdateData): undefined | unknown[][];
-			delete(data: DeleteData): undefined | unknown[][];
-		}, {
+		}), {
 			insert: (data: InsertData): undefined | unknown[][] =>
 				this.__insert(ReturnMethod.values, data) as any,
 	
@@ -204,7 +215,7 @@ export abstract class BaseClient {
 	}
 
 
-	scalars = Object.assign(
+	scalars: ScalarsMethod = Object.assign(
 		((sqlOrSelection: string | SelectClauses | Table, ...rest: unknown[]): unknown[] | Record<PropertyKey, unknown> => {
 			if (typeof sqlOrSelection === "string") {
 				return this.execute(ReturnMethod.scalars, sqlOrSelection, rest) as unknown[];
@@ -215,22 +226,13 @@ export abstract class BaseClient {
 			else {
 				return this.__select(ReturnMethod.scalars, sqlOrSelection) as unknown[] | Record<PropertyKey, unknown>;
 			}
-		}) as unknown as {
-			<T>(clauses: SelectClauses & { nestBy: NestByClause }): T;
-			<V = unknown>(table: Table): V[];
-			<V = unknown>(clauses: SelectClauses): V[];
-			<V = unknown>(sql: string, ...params: unknown[]): V[];
-	
-			insert(data: InsertData): undefined | unknown[];
-			update(data: UpdateData): undefined | unknown[];
-			delete(data: DeleteData): undefined | unknown[];
-		}, {
+		}) as unknown as ScalarsMethod, {
 			insert: (data: InsertData): undefined | unknown[] =>
 				(this.__insert(ReturnMethod.values, data) as unknown[][] | undefined)?.map(row => row[0]),
-	
+
 			update: (data: UpdateData): undefined | unknown[] =>
 				(this.__update(data, ReturnMethod.values) as unknown[][] | undefined)?.map(row => row[0]),
-	
+
 			delete: (data: DeleteData): undefined | unknown[] =>
 				(this.__delete(data, ReturnMethod.values) as unknown[][] | undefined)?.map(row => row[0])
 		}

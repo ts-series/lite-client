@@ -167,7 +167,17 @@ export const SqlScalarArity: Partial<Record<symbol, number>> = {
 
 // 4  JOIN TYPES
 
-export const Join = {
+export const Join: {
+	readonly Inner: symbol;
+	readonly Left: symbol;
+	readonly LeftOuter: symbol;
+	readonly Cross: symbol;
+	readonly Natural: symbol;
+	readonly NaturalLeft: symbol;
+	readonly NaturalLeftOuter: symbol;
+	readonly NaturalInner: symbol;
+	readonly NaturalCross: symbol;
+} = {
 	Inner: Symbol("inner join"),
 	Left: Symbol("left join"),
 	LeftOuter: Symbol("left outer join"),
@@ -177,6 +187,6 @@ export const Join = {
 	NaturalLeftOuter: Symbol("natural left outer join"),
 	NaturalInner: Symbol("natural inner join"),
 	NaturalCross: Symbol("natural cross join")
-} as const;
+};
 
 export type Join = typeof Join[keyof typeof Join];

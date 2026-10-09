@@ -5,6 +5,9 @@
 	"exports": {
 		".": "./src/sqlite.ts"
 	},
+	"publish": {
+		"include": ["src/", "README.md", "LICENSE"]
+	},
 	"compilerOptions": {
 		"strict": true,
 		"checkJs": true
