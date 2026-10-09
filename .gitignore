@@ -1,0 +1,15 @@
+# HIDDEN SOURCE FILES
+.*.ts
+
+# ENVIRONMENT
+.env
+.env.*
+
+# EDITORS
+.vscode/
+
+# TOOLS
+.deno/
+
+# BUILDING
+dist/

@@ -1,0 +1,17 @@
+{
+	"name": "@ts-series/lite-client",
+	"version": "2.0.0",
+	"description": "A driver-agnostic TypeScript ORM for SQLite that maps database schemas directly to type-safe, high-performance query classes.",
+	"exports": {
+		".": "./src/sqlite.ts"
+	},
+	"compilerOptions": {
+		"strict": true,
+		"checkJs": true
+	},
+	"license": "Unlicense",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ts-series/lite-client.git"
+	}
+}
